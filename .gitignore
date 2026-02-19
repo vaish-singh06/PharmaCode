@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+
+# Env
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large genomic files
+sample_data/raw/
+sample_data/*.gz
+sample_data/*.vcf.gz
+
+# Node (future frontend)
+node_modules/
+backend/sample_data/raw/
+*.vcf.gz
+*.gz

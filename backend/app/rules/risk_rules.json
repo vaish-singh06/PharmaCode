@@ -1,0 +1,45 @@
+{
+  "CODEINE": {
+    "CYP2D6": {
+      "UM": {"risk_label": "Toxic", "severity": "high", "confidence": 0.90},
+      "PM": {"risk_label": "Ineffective", "severity": "moderate", "confidence": 0.90},
+      "IM": {"risk_label": "Adjust Dosage", "severity": "low", "confidence": 0.75},
+      "NM": {"risk_label": "Safe", "severity": "none", "confidence": 0.90}
+    }
+  },
+  "CLOPIDOGREL": {
+    "CYP2C19": {
+      "PM": {"risk_label": "Ineffective", "severity": "high", "confidence": 0.90},
+      "IM": {"risk_label": "Adjust Dosage", "severity": "moderate", "confidence": 0.80},
+      "NM": {"risk_label": "Safe", "severity": "none", "confidence": 0.90},
+      "RM": {"risk_label": "Safe", "severity": "none", "confidence": 0.80}
+    }
+  },
+  "WARFARIN": {
+    "CYP2C9": {
+      "PM": {"risk_label": "Adjust Dosage", "severity": "moderate", "confidence": 0.85},
+      "IM": {"risk_label": "Adjust Dosage", "severity": "moderate", "confidence": 0.80},
+      "NM": {"risk_label": "Safe", "severity": "none", "confidence": 0.85}
+    }
+  },
+  "SIMVASTATIN": {
+    "SLCO1B1": {
+      "LowFunction": {"risk_label": "Toxic", "severity": "moderate", "confidence": 0.85},
+      "NormalFunction": {"risk_label": "Safe", "severity": "none", "confidence": 0.90}
+    }
+  },
+  "AZATHIOPRINE": {
+    "TPMT": {
+      "PM": {"risk_label": "Toxic", "severity": "high", "confidence": 0.95},
+      "IM": {"risk_label": "Adjust Dosage", "severity": "moderate", "confidence": 0.85},
+      "NM": {"risk_label": "Safe", "severity": "none", "confidence": 0.90}
+    }
+  },
+  "FLUOROURACIL": {
+    "DPYD": {
+      "PM": {"risk_label": "Toxic", "severity": "critical", "confidence": 0.95},
+      "IM": {"risk_label": "Adjust Dosage", "severity": "high", "confidence": 0.90},
+      "NM": {"risk_label": "Safe", "severity": "none", "confidence": 0.90}
+    }
+  }
+}

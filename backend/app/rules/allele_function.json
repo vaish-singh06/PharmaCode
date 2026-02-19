@@ -1,0 +1,39 @@
+{
+  "CYP2D6": {
+    "*1": "normal",
+    "*2": "normal",
+    "*3": "no_function",
+    "*4": "no_function",
+    "*5": "no_function",
+    "*6": "no_function",
+    "*10": "decreased",
+    "*17": "decreased",
+    "*41": "decreased"
+  },
+  "CYP2C19": {
+    "*1": "normal",
+    "*2": "no_function",
+    "*3": "no_function",
+    "*17": "increased"
+  },
+  "CYP2C9": {
+    "*1": "normal",
+    "*2": "decreased",
+    "*3": "decreased"
+  },
+  "SLCO1B1": {
+    "*1": "normal",
+    "*5": "decreased"
+  },
+  "TPMT": {
+    "*1": "normal",
+    "*2": "no_function",
+    "*3A": "no_function",
+    "*3C": "no_function"
+  },
+  "DPYD": {
+    "*1": "normal",
+    "*2A": "no_function",
+    "c.2846A>T": "decreased"
+  }
+}

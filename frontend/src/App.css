@@ -1,0 +1,429 @@
+/* ═══════════════════════════════════════════════════════════
+   PharmaGuard AI — Enhanced Design System v2.0
+   Aesthetic: Biopharma Command Center · Dark Precision
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
+
+/* ── CSS Variables ─────────────────────────────────────────── */
+:root {
+  --bg-0: #020c18;
+  --bg-1: #041525;
+  --bg-2: #071e35;
+  --surface: #0a2440;
+  --surface-2: #0d2d50;
+  --surface-glass: rgba(7, 30, 53, 0.8);
+  --surface-glass-light: rgba(10, 36, 64, 0.6);
+
+  --accent: #0df2ff;
+  --accent-2: #00b8ff;
+  --accent-dim: rgba(13, 242, 255, 0.1);
+  --accent-dim-2: rgba(13, 242, 255, 0.05);
+  --accent-glow: 0 0 24px rgba(13, 242, 255, 0.4);
+  --accent-glow-sm: 0 0 12px rgba(13, 242, 255, 0.3);
+
+  --neon-green: #05f5a0;
+  --neon-green-dim: rgba(5, 245, 160, 0.1);
+  --neon-green-glow: 0 0 20px rgba(5, 245, 160, 0.45);
+
+  --amber: #ffcc5c;
+  --amber-dim: rgba(255, 204, 92, 0.12);
+  --amber-glow: 0 0 16px rgba(255, 204, 92, 0.4);
+
+  --danger: #ff4757;
+  --danger-dim: rgba(255, 71, 87, 0.12);
+  --danger-glow: 0 0 16px rgba(255, 71, 87, 0.4);
+
+  --purple: #c77dff;
+  --purple-dim: rgba(199, 125, 255, 0.12);
+  --purple-glow: 0 0 16px rgba(199, 125, 255, 0.4);
+
+  --text-primary: #e2f4ff;
+  --text-secondary: #6ba3c4;
+  --text-muted: #2e6080;
+
+  --border: rgba(13, 242, 255, 0.08);
+  --border-md: rgba(13, 242, 255, 0.15);
+  --border-hover: rgba(13, 242, 255, 0.3);
+  --border-active: rgba(13, 242, 255, 0.5);
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
+
+  --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 20px 60px rgba(0, 0, 0, 0.6), 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Base Reset ────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* CRITICAL: Force dark background — overrides Bootstrap, browser defaults, everything */
+html,
+html body,
+body {
+  background-color: #020c18 !important;
+  background: #020c18 !important;
+  color: #e2f4ff !important;
+  font-family: 'DM Sans', 'Figtree', sans-serif !important;
+  font-size: 15px;
+  line-height: 1.65;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+/* Also lock the root element */
+#root {
+  background-color: #020c18 !important;
+  min-height: 100vh;
+}
+
+/* ── Deep dark base layer (not pseudo-element, actual bg) ── */
+.pg-app {
+  background:
+    radial-gradient(ellipse 70% 50% at 5% -5%, rgba(0, 110, 210, 0.2) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 95% 100%, rgba(5, 245, 160, 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 60% at 50% 60%, rgba(0, 35, 90, 0.18) 0%, transparent 70%),
+    #020c18 !important;
+  min-height: 100vh;
+  background-attachment: fixed;
+}
+
+/* Grid overlay on pg-app (not body, so it layers correctly) */
+.pg-app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(13, 242, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13, 242, 255, 0.02) 1px, transparent 1px);
+  background-size: 52px 52px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(13, 242, 255, 0.25);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(13, 242, 255, 0.45); }
+
+/* ── JSON Box ──────────────────────────────────────────────── */
+.json-box {
+  background: rgba(0, 8, 20, 0.9);
+  color: #05f5a0;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  max-height: 340px;
+  overflow: auto;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  border: 1px solid rgba(5, 245, 160, 0.18);
+  white-space: pre-wrap;
+  line-height: 1.7;
+  letter-spacing: 0.2px;
+}
+
+/* ═══════════════════════════════════════
+   Decision Trace Card
+   ═══════════════════════════════════════ */
+
+.trace-card {
+  margin-top: 16px;
+  background: rgba(0, 15, 35, 0.7);
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  backdrop-filter: blur(12px);
+  animation: fadeSlideUp 0.4s ease both;
+  position: relative;
+  overflow: hidden;
+}
+
+.trace-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.6;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.trace-header {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 14px;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trace-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.trace-score-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  background: rgba(13, 242, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.trace-score-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.trace-score-value {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -1px;
+}
+
+.trace-section-title {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.allele-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 10px;
+}
+
+.allele-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  width: 65px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.allele-bar-wrapper {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border-radius: 100px;
+  height: 5px;
+  overflow: hidden;
+}
+
+.allele-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+  box-shadow: 0 0 8px rgba(13, 242, 255, 0.5);
+  border-radius: 100px;
+  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.allele-meta {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+  min-width: 120px;
+  text-align: right;
+}
+
+.trace-rule {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.trace-rule-text {
+  font-size: 13px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+
+.trace-method {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: rgba(13, 242, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+}
+
+/* ═══════════════════════════════════════
+   Risk Severity Meter
+   ═══════════════════════════════════════ */
+
+.severity-meter {
+  background: rgba(0, 12, 28, 0.6);
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  animation: fadeSlideUp 0.4s ease both;
+  position: relative;
+  overflow: hidden;
+}
+
+.severity-header {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.severity-bar-track {
+  height: 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+/* Tick marks */
+.severity-bar-track::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent calc(25% - 1px),
+    rgba(0,0,0,0.3) calc(25% - 1px),
+    rgba(0,0,0,0.3) 25%
+  );
+  z-index: 1;
+}
+
+.severity-bar-wrapper {
+  height: 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.severity-bar {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+
+.severity-bar::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 100px;
+  filter: blur(2px);
+}
+
+.severity-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.severity-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.severity-ticks {
+  display: flex;
+  gap: 2px;
+}
+
+.severity-tick {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  opacity: 0.25;
+  transition: opacity var(--transition);
+}
+
+.severity-tick.active { opacity: 1; }
+
+/* ═══════════════════════════════════════
+   Drug-Level Interpretation Panel
+   ═══════════════════════════════════════ */
+
+.pg-interpretation-box {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 180, 255, 0.08),
+    rgba(0, 255, 180, 0.05)
+  );
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
+  padding: 14px;
+
+  font-size: 13px;
+  line-height: 1.6;
+
+  color: var(--text-primary);
+
+  animation: interpretFade 0.4s ease;
+}
+
+@keyframes interpretFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}

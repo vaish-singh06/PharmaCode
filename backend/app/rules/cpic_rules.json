@@ -1,0 +1,46 @@
+{
+  "CODEINE": {
+    "CYP2D6": {
+      "UM": "Avoid codeine due to increased risk of morphine toxicity (use alternative analgesic)",
+      "PM": "Avoid codeine due to lack of efficacy (consider alternative analgesic)",
+      "IM": "Consider alternative analgesic or monitor closely",
+      "NM": "Standard dosing"
+    }
+  },
+  "CLOPIDOGREL": {
+    "CYP2C19": {
+      "PM": "Use alternative antiplatelet agent (e.g., prasugrel or ticagrelor) due to reduced effectiveness",
+      "IM": "Consider alternative therapy or enhanced monitoring",
+      "NM": "Standard dosing",
+      "RM": "Standard dosing"
+    }
+  },
+  "WARFARIN": {
+    "CYP2C9": {
+      "PM": "Initiate with lower maintenance dose and use genotype-informed dosing algorithms; increase monitoring of INR",
+      "IM": "Consider moderate dose reduction and close INR monitoring",
+      "NM": "Standard dosing"
+    }
+  },
+  "SIMVASTATIN": {
+    "SLCO1B1": {
+      "LowFunction": "Use lower dose or consider alternative statin (increased myopathy risk)",
+      "NormalFunction": "Standard dosing"
+    }
+  },
+  "AZATHIOPRINE": {
+    "TPMT": {
+      "PM": "Avoid azathioprine or greatly reduce starting dose; consider alternative therapy",
+      "IM": "Start at reduced dose (e.g., 30%-70% of standard) with careful monitoring",
+      "NM": "Standard dosing"
+    }
+  },
+  "FLUOROURACIL": {
+    "DPYD": {
+      "PM": "Avoid fluoropyrimidines or use alternative therapy due to high risk of severe toxicity",
+      "IM": "Reduce dose (often 25%-50% depending on activity score) and monitor closely",
+      "NM": "Standard dosing"
+    }
+  }
+  
+}

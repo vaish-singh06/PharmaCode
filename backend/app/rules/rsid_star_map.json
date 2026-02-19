@@ -1,0 +1,23 @@
+{
+  "rs3892097": {"gene": "CYP2D6", "allele": "*4"},
+  "rs5030655": {"gene": "CYP2D6", "allele": "*3"},
+  "rs28371725": {"gene": "CYP2D6", "allele": "*41"},
+  "rs1065852": {"gene": "CYP2D6", "allele": "*10"},
+  "rs1135840": {"gene": "CYP2D6", "allele": "*2"},
+
+  "rs4244285": {"gene": "CYP2C19", "allele": "*2"},
+  "rs4986893": {"gene": "CYP2C19", "allele": "*3"},
+  "rs12248560": {"gene": "CYP2C19", "allele": "*17"},
+
+  "rs1799853": {"gene": "CYP2C9", "allele": "*2"},
+  "rs1057910": {"gene": "CYP2C9", "allele": "*3"},
+
+  "rs4149056": {"gene": "SLCO1B1", "allele": "*5"},
+  "rs2306283": {"gene": "SLCO1B1", "allele": "*1B"},
+
+  "rs1800460": {"gene": "TPMT", "allele": "*3A"},
+  "rs1142345": {"gene": "TPMT", "allele": "*3C"},
+
+  "rs3918290": {"gene": "DPYD", "allele": "*2A"},
+  "rs67376798": {"gene": "DPYD", "allele": "c.2846A>T"}
+}
