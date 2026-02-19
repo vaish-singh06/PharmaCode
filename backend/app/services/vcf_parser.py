@@ -20,10 +20,7 @@ except Exception as e:
     _rsid_gene = {}
 
 
-# ⭐ ---------- NEW: CLEAN VCF ----------
 def _clean_vcf(file_path: str) -> str:
-    import tempfile
-
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".vcf")
     clean_path = tmp.name
 
@@ -35,34 +32,44 @@ def _clean_vcf(file_path: str) -> str:
 
             parts = line.strip().split()
 
-            # Handle GIAB broken POS column (extra split)
-            if len(parts) > 10:
-                # Merge tokens between CHROM and ID as POS
-                chrom = parts[0]
-
-                # POS should be numeric → merge until numeric found
-                pos_tokens = []
-                i = 1
-                while i < len(parts) and not parts[i].startswith("rs"):
-                    pos_tokens.append(parts[i])
-                    i += 1
-
-                if not pos_tokens:
-                    continue
-
-                pos = pos_tokens[-1]  # keep last numeric POS
-                rest = parts[i:]
-
-                parts = [chrom, pos] + rest
-
-            # Skip invalid rows
-            if len(parts) < 10:
+            # Skip extremely broken rows
+            if len(parts) < 8:
                 continue
 
-            # Keep only first 10 columns
-            parts = parts[:10]
+            # ⭐ Fix broken POS column
+            chrom = parts[0]
 
-            fout.write("\t".join(parts) + "\n")
+            # Find rsID index
+            rs_index = None
+            for i, p in enumerate(parts):
+                if p.startswith("rs"):
+                    rs_index = i
+                    break
+
+            if rs_index is None:
+                continue
+
+            # POS should be token before rsID (last numeric)
+            pos_tokens = parts[1:rs_index]
+            pos = None
+            for token in reversed(pos_tokens):
+                if token.isdigit():
+                    pos = token
+                    break
+
+            if pos is None:
+                continue
+
+            # Rebuild correct VCF row
+            new_parts = [chrom, pos] + parts[rs_index:]
+
+            # Ensure 10 columns
+            if len(new_parts) >= 10:
+                new_parts = new_parts[:10]
+            else:
+                continue
+
+            fout.write("\t".join(new_parts) + "\n")
 
     return clean_path
 
