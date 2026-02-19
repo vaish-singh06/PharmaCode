@@ -11,7 +11,7 @@ TARGET_GENES = ["CYP2D6", "CYP2C19", "CYP2C9", "SLCO1B1", "TPMT", "DPYD"]
 
 # Load rsID → gene mapping
 BASE = Path(__file__).resolve().parents[1]
-RULES_DIR = BASE / "rules"
+RULES_DIR = BASE 
 
 try:
     _rsid_gene = json.loads((RULES_DIR / "rsid_gene_map.json").read_text())
