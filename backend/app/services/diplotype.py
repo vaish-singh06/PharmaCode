@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from collections import Counter
 
 BASE = Path(__file__).resolve().parents[1]
 RULES_DIR = BASE / "rules"
@@ -71,7 +72,6 @@ def generate_clinical_interpretation(gene, phenotype, activity_score):
         f"Activity Score = {activity_score}, supporting phenotype classification."
 
 
-# ✅ STAR INFERENCE
 def infer_star_from_rsids(variants):
 
     gene_alleles = {g: [] for g in TARGET_GENES}
@@ -82,22 +82,43 @@ def infer_star_from_rsids(variants):
         if gene not in TARGET_GENES:
             continue
 
+        # If the VCF already provided a STAR allele in INFO, respect that and apply multiplicity
         if v.get("star"):
-            gene_alleles[gene].append(v["star"])
+            # if star provided once but genotype is homozygous, append twice
+            star_val = v["star"]
+            times = 1
+            if v.get("is_homozygous"):
+                times = 2
+            for _ in range(times):
+                gene_alleles[gene].append(star_val)
             continue
 
+        # Try mapping by rsid -> star
         rsid = v.get("rsid")
         if rsid in _rsid_star_map:
-
             mapping = _rsid_star_map[rsid]
-
             if mapping.get("gene") == gene:
-                gene_alleles[gene].append(mapping["allele"])
+                allele_name = mapping["allele"]
+                # determine multiplicity from allele_indices / alt_count (added by parser)
+                alt_count = v.get("alt_count", None)
+                if alt_count is None:
+                    # fallback: if genotype string contains two same non-ref alleles, assume hom
+                    gt = v.get("genotype", "")
+                    if "/" in gt:
+                        a, b = gt.split("/")
+                        if a == b and a != "?":
+                            alt_count = 2 if a != "0" else 0
+                        else:
+                            alt_count = 1 if (a != "0" or b != "0") else 0
+                    else:
+                        alt_count = 0
 
-    for gene in gene_alleles:
-        gene_alleles[gene] = list(set(gene_alleles[gene]))
+                # append allele `alt_count` times (0 => don't append)
+                for _ in range(max(0, alt_count)):
+                    gene_alleles[gene].append(allele_name)
 
-    return gene_alleles
+    # Keep multiplicity as appended (homozygous => two entries)
+    return {g: gene_alleles[g] for g in gene_alleles}
 
 
 # ✅ ACTIVITY SCORE + TRACE DETAILS
@@ -113,7 +134,8 @@ def calculate_activity_score_with_trace(gene, alleles):
         function = fn_map.get(allele)
 
         if not function:
-            function = fn_map.get(allele.strip("*"), "normal")
+            # try without star prefix, then fallback to 'normal'
+            function = fn_map.get(allele.strip("*"), None) or fn_map.get(allele.replace("*", ""), None) or "normal"
 
         score = FUNCTION_SCORES.get(function, 1.0)
 
@@ -165,11 +187,35 @@ def phenotype_from_activity_score(gene, activity_score):
     return "NM", f"Activity Score = {activity_score} → Default phenotype applied"
 
 
+# Helper: choose canonical ordering for diplotype (prefer *1 on left, then numeric)
+def _canonical_pair(a, b):
+    if a == b:
+        return a, b
+    if a == "*1" and b != "*1":
+        return a, b
+    if b == "*1" and a != "*1":
+        return b, a
+
+    def _num_key(x):
+        # extract numeric part if possible for sensible ordering
+        s = "".join(ch for ch in x if ch.isdigit())
+        try:
+            return int(s) if s else float("inf")
+        except:
+            return float("inf")
+
+    if _num_key(a) <= _num_key(b):
+        return a, b
+    else:
+        return b, a
+
+
 # ✅ DIPLOTYPE + TRACE ENGINE
 def call_diplotype_and_phenotype(gene, detected_alleles):
 
     gene_map = _diplotype_map.get(gene, {})
 
+    # No variants -> wildtype
     if not detected_alleles:
 
         diplotype = "*1/*1"
@@ -192,27 +238,42 @@ def call_diplotype_and_phenotype(gene, detected_alleles):
 
         return diplotype, phenotype, activity_score, decision_trace, clinical_interpretation
 
-    if len(detected_alleles) == 1:
+    # If the inference provided multiplicity correctly, detected_alleles list will include duplicate entries for homozygous alt.
+    # Use allele counts to reliably decide diplotype for diploid genome.
+    counts = Counter(detected_alleles)
 
-        allele = detected_alleles[0]
-
-        if allele == "*1":
-            diplotype = "*1/*1"
-            alleles = ["*1", "*1"]
+    # If only a single allele observed across all variants (but may have multiplicity in counts),
+    # decide if homozygous or heterozygous with *1
+    if len(counts) == 1:
+        only_allele = next(iter(counts.keys()))
+        ct = counts[only_allele]
+        if ct >= 2:
+            alleles = [only_allele, only_allele]
         else:
-            diplotype = f"*1/{allele}"
-            alleles = ["*1", allele]
+            # observed once -> assume *1/allele (heterozygous)
+            alleles = ["*1", only_allele] if only_allele != "*1" else ["*1", "*1"]
 
     else:
+        # multiple allele types present: pick the two most supported alleles
+        most = counts.most_common()
+        # If the top allele has count >=2 -> homozygous for top allele
+        if most[0][1] >= 2:
+            alleles = [most[0][0], most[0][0]]
+        else:
+            # pick top two distinct alleles (if only one distinct allele present, fill with *1)
+            first = most[0][0]
+            second = most[1][0] if len(most) > 1 else "*1"
+            alleles = [first, second]
 
-        alleles = sorted(detected_alleles)
-        diplotype = f"{alleles[0]}/{alleles[1]}"
+    # enforce canonical ordering for diplotype string (e.g., *1/*3 not *3/*1)
+    left, right = _canonical_pair(alleles[0], alleles[1])
+    diplotype = f"{left}/{right}"
 
     phenotype_lookup = gene_map.get(diplotype)
 
     activity_score, allele_trace = calculate_activity_score_with_trace(
         gene,
-        alleles
+        [left, right]
     )
 
     if phenotype_lookup:
@@ -236,7 +297,7 @@ def call_diplotype_and_phenotype(gene, detected_alleles):
     )
 
     decision_trace = {
-        "alleles": alleles,
+        "alleles": [left, right],
         "allele_details": allele_trace,
         "activity_score": activity_score,
         "phenotype_rule": phenotype_rule,
