@@ -1,8 +1,13 @@
 import vcfpy
 import json
 from pathlib import Path
+import logging
+import tempfile
+import os
 
-TARGET_GENES = ["CYP2D6","CYP2C19","CYP2C9","SLCO1B1","TPMT","DPYD"]
+logger = logging.getLogger(__name__)
+
+TARGET_GENES = ["CYP2D6", "CYP2C19", "CYP2C9", "SLCO1B1", "TPMT", "DPYD"]
 
 # Load rsID → gene mapping
 BASE = Path(__file__).resolve().parents[1]
@@ -10,32 +15,58 @@ RULES_DIR = BASE / "rules"
 
 try:
     _rsid_gene = json.loads((RULES_DIR / "rsid_gene_map.json").read_text())
-except:
+except Exception as e:
+    logger.warning(f"rsid_gene_map load failed: {e}")
     _rsid_gene = {}
 
+
+# ⭐ ---------- NEW: CLEAN VCF ----------
+def _clean_vcf(file_path: str) -> str:
+    """
+    Convert space-delimited VCF rows into tab-delimited safe VCF.
+    Keeps header intact. Skips corrupted rows.
+    """
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".vcf")
+    clean_path = tmp.name
+
+    with open(file_path, "r", errors="ignore") as fin, open(clean_path, "w") as fout:
+        for line in fin:
+            if line.startswith("#"):
+                fout.write(line)
+                continue
+
+            parts = line.strip().split()
+
+            # Skip broken rows
+            if len(parts) < 5:
+                continue
+
+            fout.write("\t".join(parts) + "\n")
+
+    return clean_path
+
+
+# ⭐ ---------- MAIN PARSER ----------
 def parse_vcf(file_path: str):
-    reader = vcfpy.Reader.from_path(file_path)
+    # Clean VCF first (prevents vcfpy crash)
+    safe_path = _clean_vcf(file_path)
+
+    reader = vcfpy.Reader.from_path(safe_path)
     variants = []
 
     for record in reader:
         info = record.INFO or {}
 
         # ---------- GENE DETECTION ----------
-        # 1) Try INFO tag first (synthetic VCF support)
         gene = info.get("GENE")
         if isinstance(gene, list):
             gene = gene[0]
 
-        # 2) If missing, fallback to rsID → gene mapping (real GIAB VCF support)
         rsid = record.ID
         if isinstance(rsid, list):
             rsid = rsid[0]
 
         if not gene and rsid in _rsid_gene:
-            gene = _rsid_gene.get(rsid)
-
-        # Skip non-target genes
-        if not gene:
             gene = _rsid_gene.get(rsid)
 
         if gene not in TARGET_GENES:
@@ -51,39 +82,30 @@ def parse_vcf(file_path: str):
             gt = call.data.get("GT", "0/0")
 
         ref = record.REF
-
-        # Build allele map correctly for ALL ALT alleles
         allele_map = {"0": ref}
 
         alts = [a.value for a in record.ALT] if record.ALT else []
         for idx, alt_val in enumerate(alts, start=1):
             allele_map[str(idx)] = alt_val
 
-        # Normalize genotype separators
-        sep = "/"
-        if "|" in gt:
-            sep = "|"
-
+        sep = "|" if "|" in gt else "/"
         tokens = gt.split(sep)
 
-        # Handle malformed / missing GT
         if len(tokens) < 2:
             tokens = [tokens[0], "0"]
 
         a, b = tokens[0], tokens[1]
 
-        # Handle missing alleles (./.)
         allele_a = allele_map.get(a, "?") if a != "." else "?"
         allele_b = allele_map.get(b, "?") if b != "." else "?"
 
         genotype_str = f"{allele_a}/{allele_b}"
 
-        # ---------- STAR ALLELE ----------
+        # ---------- STAR ----------
         star = info.get("STAR")
-        if isinstance(star,list):
+        if isinstance(star, list):
             star = star[0]
 
-        # ---------- VARIANT OBJECT ----------
         variants.append({
             "gene": gene,
             "rsid": rsid,
@@ -91,5 +113,11 @@ def parse_vcf(file_path: str):
             "star": star,
             "info": dict(info)
         })
+
+    # Cleanup temp file
+    try:
+        os.remove(safe_path)
+    except:
+        pass
 
     return variants
