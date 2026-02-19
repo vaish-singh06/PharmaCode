@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.routes.analyze import router as analyze_router
-from app.routes.report import router as report_router   # ⭐ ADD THIS
+from app.routes.report import router as report_router   
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 app = FastAPI(title="PharmaGuard API")
 
 app.include_router(analyze_router, prefix="/analyze")
-app.include_router(report_router, prefix="/report")   # ⭐ ADD THIS
+app.include_router(report_router, prefix="/report")   
 
 @app.get("/")
 def root():
@@ -19,7 +19,7 @@ def root():
 def health():
     return {"status": "ok", "service": "PharmaGuard"}
 
-origins = ["*"]
+origins = ["https://pharma-code.vercel.app"]
 
 app.add_middleware(
     CORSMiddleware,
