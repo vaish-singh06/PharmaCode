@@ -22,10 +22,8 @@ except Exception as e:
 
 # ⭐ ---------- NEW: CLEAN VCF ----------
 def _clean_vcf(file_path: str) -> str:
-    """
-    Convert space-delimited VCF rows into tab-delimited safe VCF.
-    Keeps header intact. Skips corrupted rows.
-    """
+    import tempfile
+
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".vcf")
     clean_path = tmp.name
 
@@ -37,9 +35,32 @@ def _clean_vcf(file_path: str) -> str:
 
             parts = line.strip().split()
 
-            # Skip broken rows
-            if len(parts) < 5:
+            # Handle GIAB broken POS column (extra split)
+            if len(parts) > 10:
+                # Merge tokens between CHROM and ID as POS
+                chrom = parts[0]
+
+                # POS should be numeric → merge until numeric found
+                pos_tokens = []
+                i = 1
+                while i < len(parts) and not parts[i].startswith("rs"):
+                    pos_tokens.append(parts[i])
+                    i += 1
+
+                if not pos_tokens:
+                    continue
+
+                pos = pos_tokens[-1]  # keep last numeric POS
+                rest = parts[i:]
+
+                parts = [chrom, pos] + rest
+
+            # Skip invalid rows
+            if len(parts) < 10:
                 continue
+
+            # Keep only first 10 columns
+            parts = parts[:10]
 
             fout.write("\t".join(parts) + "\n")
 
