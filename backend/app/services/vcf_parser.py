@@ -127,6 +127,7 @@ def parse_vcf(file_path: str):
         allele_a = allele_map.get(a, "?") if a != "." else "?"
         allele_b = allele_map.get(b, "?") if b != "." else "?"
 
+        # ---------- NORMALIZED GENOTYPE STRING ----------
         genotype_str = f"{allele_a}/{allele_b}"
 
         # ---------- STAR ----------
@@ -134,10 +135,26 @@ def parse_vcf(file_path: str):
         if isinstance(star, list):
             star = star[0]
 
+        # ⭐ ---------- NEW: allele multiplicity metadata ----------
+        allele_indices = [a, b]  # e.g. ["0","1"] or ["1","1"]
+
+        # Count alt alleles
+        alt_count = sum(1 for idx in allele_indices if idx not in ("0", ".", None))
+
+        # Detect homozygous alt
+        is_homozygous = (
+            allele_indices[0] == allele_indices[1]
+            and allele_indices[0] not in ("0", ".", None)
+        )
+
+        # ---------- VARIANT OBJECT ----------
         variants.append({
             "gene": gene,
             "rsid": rsid,
             "genotype": genotype_str,
+            "allele_indices": allele_indices,   # ⭐ NEW
+            "alt_count": alt_count,             # ⭐ NEW
+            "is_homozygous": is_homozygous,     # ⭐ NEW
             "star": star,
             "info": dict(info)
         })
