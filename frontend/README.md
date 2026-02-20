@@ -1,70 +1,189 @@
-# Getting Started with Create React App
+# 🧬 PharmaGuard — Pharmacogenomic Risk Prediction System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+PharmaGuard is an AI-powered web application built for the **RIFT 2026 Hackathon** that analyzes patient genetic data (VCF files) and predicts **drug-specific risks** using pharmacogenomics. The system provides **clinically actionable recommendations** aligned with CPIC guidelines and generates **explainable AI insights** to support safer, personalized medicine.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🌐 Live Demo
 
-### `npm start`
+👉 Deployed Application:  
+https://pharma-code.vercel.app/
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🎥 Demo Video (LinkedIn)
 
-### `npm test`
+👉 Project Demo Video:  
+https://www.linkedin.com/posts/omkar-chavan-8b59a8334_rift2026-pharmaguard-pharmacogenomics-ugcPost-7430436591375986689-f_E-?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFQnEQkBZ9hTepbDydPe3LWCmZM6dT7V0to
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 🧠 Problem Overview
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Adverse drug reactions cause serious harm and even death in many patients every year. One major reason is **genetic variation** that affects how individuals metabolize drugs.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+PharmaGuard solves this by:
+- Parsing VCF (Variant Call Format) files
+- Identifying pharmacogenomic variants
+- Mapping genes to drug response phenotypes
+- Predicting risk categories:
+  - Safe
+  - Adjust Dosage
+  - Toxic
+  - Ineffective
+  - Unknown
+- Providing clinical recommendations and LLM-generated explanations
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## 🏗️ Architecture Overview
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+**Workflow:**
+1. User uploads VCF file and enters drug name(s)
+2. Backend:
+   - Validates and parses VCF
+   - Extracts variants (GENE, STAR, rsID)
+   - Maps genotype to phenotype
+   - Applies drug–gene risk rules
+   - Generates clinical recommendation
+   - Uses LLM for explanation
+   - Builds structured JSON output
+3. Frontend:
+   - Displays color-coded risk result
+   - Shows recommendation and explanation
+   - Allows JSON copy and download
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+**High-Level Architecture:**
+Frontend (React) → Backend (FastAPI) → VCF Parser + Risk Engine + LLM → JSON Response → UI
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🛠️ Tech Stack
 
-## Learn More
+**Frontend:**
+- React
+- Axios
+- HTML/CSS
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+**Backend:**
+- Python
+- FastAPI
+- Uvicorn
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+**AI / Logic:**
+- Rule-based pharmacogenomic risk engine
+- LLM for explanation generation
 
-### Code Splitting
+**Deployment:**
+- Vercel
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## ⚙️ Installation Instructions (Local Setup)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 1️⃣ Clone the Repository
 
-### Making a Progressive Web App
+git clone https://github.com/vaish-singh06/pharma-code.git
+cd pharma-code
+2️⃣ Backend Setup
+cd backend
+python -m venv venv
+venv\Scripts\activate   # On Windows
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Backend will run at:
+http://127.0.0.1:8000
 
-### Advanced Configuration
+3️⃣ Frontend Setup
+cd ../frontend
+npm install
+npm start
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Frontend will run at:
+http://localhost:3000
 
-### Deployment
+📡 API Documentation
+POST /analyze/
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Description:
+Analyzes uploaded VCF file and drug input to return pharmacogenomic risk assessment.
 
-### `npm run build` fails to minify
+Request:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Method: POST
+
+Content-Type: multipart/form-data
+
+Fields:
+
+file: VCF file
+
+drug: Drug name(s), comma-separated
+
+Response:
+
+JSON object containing:
+
+patient_id
+
+drug
+
+timestamp
+
+risk_assessment
+
+pharmacogenomic_profile
+
+clinical_recommendation
+
+llm_generated_explanation
+
+quality_metrics
+
+🧪 Usage Examples
+Example Steps:
+
+Open the web app: https://pharma-code.vercel.app/
+
+Upload a VCF file
+
+Enter a drug name (e.g., CODEINE, WARFARIN)
+
+Click Analyze
+
+View:
+
+Risk label (Safe / Adjust / Toxic / Ineffective / Unknown)
+
+Gene and phenotype
+
+Clinical recommendation
+
+AI-generated explanation
+
+Copy or download the JSON output
+
+💊 Supported Drugs
+
+CODEINE (CYP2D6)
+
+WARFARIN (CYP2C9)
+
+CLOPIDOGREL (CYP2C19)
+
+SIMVASTATIN (SLCO1B1)
+
+AZATHIOPRINE (TPMT)
+
+FLUOROURACIL (DPYD)
+
+👥 Team Members
+
+Vaishnavi Chandel
+
+Omkar Chavan
+
+Ritu Krishnan
+
+Sneha Kumari 
