@@ -3,7 +3,7 @@
 PharmaGuard is an AI-powered web application built for the **RIFT 2026 Hackathon** that analyzes patient genetic data (VCF files) and predicts **drug-specific risks** using pharmacogenomics. The system provides **clinically actionable recommendations** aligned with CPIC guidelines and generates **explainable AI insights** to support safer, personalized medicine.
 
 ---
-
+   
 ## 🌐 Live Demo
 
 👉 Deployed Application:  
